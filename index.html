@@ -416,7 +416,7 @@
       </svg>
     </button>
   </header>
-
+</br>
   <p class="important-note"><span class="red">IMPORTANT:</span> Before using this calculator, please refer to guidelines for state specifics.</p>
 
   <!-- Form -->
@@ -1066,8 +1066,6 @@ calcBtn.addEventListener('click', () => {
       const diff = dateDiff(parsedIssueDate, workup);
       const tiles = [];
       tiles.push(`<div class="tile"><div class="tile-num">${diff.years}</div><div class="tile-lbl">${diff.years===1?'year':'years'}</div></div>`);
-      if (diff.months > 0) tiles.push(`<div class="tile"><div class="tile-num">${diff.months}</div><div class="tile-lbl">${diff.months===1?'month':'months'}</div></div>`);
-      if (diff.days   > 0) tiles.push(`<div class="tile"><div class="tile-num">${diff.days}</div><div class="tile-lbl">${diff.days===1?'day':'days'}</div></div>`);
       html = `<div class="result success">
         <div class="result-hd">${ICON_CHECK}<span class="result-title">Years licensed — MVR issue date</span></div>
         <div class="tiles">${tiles.join('')}</div>
@@ -1115,8 +1113,6 @@ calcBtn.addEventListener('click', () => {
       const diff = dateDiff(licenseDate, workup);
       const tiles = [];
       tiles.push(`<div class="tile"><div class="tile-num">${diff.years}</div><div class="tile-lbl">${diff.years===1?'year':'years'}</div></div>`);
-      if (diff.months > 0) tiles.push(`<div class="tile"><div class="tile-num">${diff.months}</div><div class="tile-lbl">${diff.months===1?'month':'months'}</div></div>`);
-      if (diff.days   > 0) tiles.push(`<div class="tile"><div class="tile-num">${diff.days}</div><div class="tile-lbl">${diff.days===1?'day':'days'}</div></div>`);
       html = `<div class="result success">
         <div class="result-hd">${ICON_CHECK}<span class="result-title">Years licensed — reported age</span></div>
         <div class="tiles">${tiles.join('')}</div>
