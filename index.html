@@ -503,6 +503,7 @@ const selState=document.getElementById('stateSelect'),dobInput=document.getEleme
   issueDateInput=document.getElementById('issueDateInput'),agePanel=document.getElementById('agePanel'),
   ageToggle=document.getElementById('ageToggle'),ageContent=document.getElementById('ageContent'),
   ageInput=document.getElementById('ageInput');
+const dobField=dobInput.closest('.field'),dobLabel=dobField.querySelector('label'),dobCalBtn=document.getElementById('dobCalBtn');
 
 function addMonths(date,m){const d=new Date(date),day=d.getDate();d.setMonth(d.getMonth()+m);if(d.getDate()!==day)d.setDate(0);return d;}
 function dateDiff(from,to){let y=to.getFullYear()-from.getFullYear(),mo=to.getMonth()-from.getMonth(),d=to.getDate()-from.getDate();if(d<0){mo--;d+=new Date(to.getFullYear(),to.getMonth(),0).getDate();}if(mo<0){y--;mo+=12;}return{years:y,months:mo,days:d};}
@@ -539,6 +540,32 @@ function bindDateInput(input,setter){
 
 // ─── Experimental features ────────────────────────────────────────────────────
 let expMvrEnabled=false,expAgeEnabled=false,parsedIssueDate=null,expAgeValue=null;
+let storedDobValue='',storedParsedDob=null;
+
+function setPrimaryDateMode(mode){
+  const isIssueDate=mode==='issue';
+  dobLabel.textContent=isIssueDate?'Original DL Issue Date':"Driver's Date of Birth";
+  dobCalBtn.setAttribute('aria-label',isIssueDate?'Open calendar for issue date':'Open calendar for date of birth');
+  dobField.classList.remove('dob-optional');
+}
+
+function enableIssueDateMode(){
+  storedDobValue=dobInput.value;
+  storedParsedDob=parsedDob;
+  dobInput.value='';
+  dobInput.classList.remove('invalid');
+  parsedDob=null;
+  parsedIssueDate=null;
+  setPrimaryDateMode('issue');
+}
+
+function restoreDobMode(){
+  dobInput.value=storedDobValue;
+  dobInput.classList.remove('invalid');
+  parsedDob=storedParsedDob;
+  parsedIssueDate=null;
+  setPrimaryDateMode('dob');
+}
 
 function updateExpPanels(code){
   if(MVR_STATES.includes(code)){
@@ -547,6 +574,7 @@ function updateExpPanels(code){
     mvrPanel.classList.toggle('panel-disabled',expAgeEnabled);
   } else {
     mvrPanel.style.display='none';
+    if(expMvrEnabled) restoreDobMode();
     mvrToggle.checked=false; expMvrEnabled=false;
     mvrContent.style.display='none';
     issueDateInput.value=''; issueDateInput.classList.remove('invalid'); parsedIssueDate=null;
@@ -562,15 +590,15 @@ mvrToggle.addEventListener('change',()=>{
       ageToggle.checked=false; expAgeEnabled=false; ageContent.style.display='none';
       ageInput.value=''; ageInput.classList.remove('invalid'); expAgeValue=null;
     }
-    expMvrEnabled=true; mvrContent.style.display='';
+    expMvrEnabled=true; mvrContent.style.display='none';
     mvrPanel.classList.remove('panel-disabled'); // Ensure self is never dimmed when active
     agePanel.classList.add('panel-disabled');
-    dobInput.closest('.field').classList.add('dob-optional');
+    enableIssueDateMode();
   } else {
     expMvrEnabled=false; mvrContent.style.display='none';
     issueDateInput.value=''; issueDateInput.classList.remove('invalid'); parsedIssueDate=null;
     agePanel.classList.remove('panel-disabled');
-    dobInput.closest('.field').classList.remove('dob-optional');
+    restoreDobMode();
   }
   resultDiv.innerHTML=''; checkReady();
 });
@@ -581,17 +609,17 @@ ageToggle.addEventListener('change',()=>{
     if(expMvrEnabled){
       mvrToggle.checked=false; expMvrEnabled=false; mvrContent.style.display='none';
       issueDateInput.value=''; issueDateInput.classList.remove('invalid'); parsedIssueDate=null;
-      dobInput.closest('.field').classList.remove('dob-optional');
+      restoreDobMode();
     }
     expAgeEnabled=true; ageContent.style.display='';
     agePanel.classList.remove('panel-disabled'); // Ensure self is never dimmed when active
     if(mvrPanel.style.display!=='none') mvrPanel.classList.add('panel-disabled');
-    dobInput.closest('.field').classList.add('dob-optional');
+    setPrimaryDateMode('dob');
   } else {
     expAgeEnabled=false; ageContent.style.display='none';
     ageInput.value=''; ageInput.classList.remove('invalid'); expAgeValue=null;
     if(mvrPanel.style.display!=='none') mvrPanel.classList.remove('panel-disabled');
-    dobInput.closest('.field').classList.remove('dob-optional');
+    setPrimaryDateMode('dob');
   }
   resultDiv.innerHTML=''; checkReady();
 });
@@ -602,7 +630,7 @@ bindDateInput(issueDateInput,v=>{parsedIssueDate=v;checkReady();});
 document.getElementById('issueDateCalBtn').addEventListener('click',()=>openCalendar(issueDateInput,v=>{parsedIssueDate=v;checkReady();}));
 
 function checkReady(){
-  const dobOk=(expMvrEnabled||expAgeEnabled)?true:!!parsedDob;
+  const dobOk=expMvrEnabled?!!parsedIssueDate:!!parsedDob;
   const ready=!!(selState.value&&dobOk&&parsedWorkup)&&(!expMvrEnabled||!!parsedIssueDate)&&(!expAgeEnabled||expAgeValue!==null);
   calcBtn.classList.toggle('btn-off',!ready); calcBtn.setAttribute('aria-disabled',ready?'false':'true');
 }
@@ -616,6 +644,7 @@ function updateStateInfo(code){
 function clearAll(){
   selState.value=''; dobInput.value=''; workupInput.value='';
   dobInput.classList.remove('invalid'); workupInput.classList.remove('invalid');
+  storedDobValue=''; storedParsedDob=null; setPrimaryDateMode('dob');
   parsedDob=null; parsedWorkup=null; resultDiv.innerHTML=''; stateInfo.classList.remove('show');
   mvrToggle.checked=false; expMvrEnabled=false; mvrContent.style.display='none'; mvrPanel.style.display='none';
   mvrPanel.classList.remove('panel-disabled');
@@ -631,10 +660,10 @@ const ICON_WARN =`<svg viewBox="0 0 20 20" fill="none" stroke="var(--warn)" stro
 const ICON_X    =`<svg viewBox="0 0 20 20" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8"/><path d="M7 7l6 6M13 7l-6 6"/></svg>`;
 
 selState.addEventListener('change',()=>{resultDiv.innerHTML='';updateStateInfo(selState.value);updateExpPanels(selState.value);checkReady();});
-bindDateInput(dobInput,v=>{parsedDob=v;});
+bindDateInput(dobInput,v=>{if(expMvrEnabled)parsedIssueDate=v;else parsedDob=v;});
 bindDateInput(workupInput,v=>{parsedWorkup=v;});
 clearBtn.addEventListener('click',clearAll);
-document.getElementById('dobCalBtn').addEventListener('click',()=>openCalendar(dobInput,v=>{parsedDob=v;}));
+dobCalBtn.addEventListener('click',()=>openCalendar(dobInput,v=>{if(expMvrEnabled)parsedIssueDate=v;else parsedDob=v;}));
 document.getElementById('workupCalBtn').addEventListener('click',()=>openCalendar(workupInput,v=>{parsedWorkup=v;}));
 
 // ─── Calendar ─────────────────────────────────────────────────────────────────
