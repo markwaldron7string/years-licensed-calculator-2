@@ -695,7 +695,7 @@ calcBtn.addEventListener('click',()=>{
 
   if(expMvrEnabled&&parsedIssueDate){
     if(workup<parsedIssueDate){html=`<div class="result danger"><div class="result-hd">${ICON_X}<span class="result-title">Workup date is before the issue date</span></div><div class="result-body">The workup date (${fmtDate(workup)}) falls before the original DL issue date (${fmtDate(parsedIssueDate)}). Please verify both dates.</div></div>`;}
-    else{html=renderLicensedOutput(code,parsedIssueDate,workup,'Years licensed — MVR issue date',`Based on original DL issue date: ${fmtDate(parsedIssueDate)}`);}
+    else{html=renderLicensedOutput(code,parsedIssueDate,workup,'Years licensed',`Based on original DL issue date: ${fmtDate(parsedIssueDate)}`);}
     resultDiv.innerHTML=html;return;
   }
 
@@ -704,7 +704,7 @@ calcBtn.addEventListener('click',()=>{
     const em=Math.round(expAgeValue*12);
     if(em<cfg.pM){html=`<div class="result danger"><div class="result-hd">${ICON_X}<span class="result-title">Not yet eligible for a learner's permit</span></div><div class="result-body">The entered age of <strong>${expAgeValue}</strong> is below the minimum permit age for ${stateName(code)} (age <strong>${cfg.pL}</strong>). Please verify the reported age.</div></div>`;}
     else if(em<cfg.lM){html=`<div class="result warn"><div class="result-hd">${ICON_WARN}<span class="result-title">Learner's permit age only — not yet licensed</span></div><div class="result-body">The entered age of <strong>${expAgeValue}</strong> falls within the learner's permit range for ${stateName(code)}. The minimum license age is <strong>${cfg.lL}</strong>.<br><br>Years licensed cannot be calculated from a permit-only age.</div></div>`;}
-    else{const ld=addMonths(dob,em);if(workup<ld){html=`<div class="result warn"><div class="result-hd">${ICON_WARN}<span class="result-title">Not yet licensed as of workup date</span></div><div class="result-body">Based on the reported license age of ${expAgeValue}, this driver would not have been licensed until ${fmtDate(ld)}.<br><br><strong style="color:var(--warn)">License eligible from: ${fmtDate(ld)}</strong></div></div>`;}else{html=renderLicensedOutput(code,ld,workup,'Years licensed — reported age',`Based on reported first license age: ${expAgeValue} · Calculated license date: ${fmtDate(ld)}`);}}
+    else{const ld=addMonths(dob,em);if(workup<ld){html=`<div class="result warn"><div class="result-hd">${ICON_WARN}<span class="result-title">Not yet licensed as of workup date</span></div><div class="result-body">Based on the reported license age of ${expAgeValue}, this driver would not have been licensed until ${fmtDate(ld)}.<br><br><strong style="color:var(--warn)">License eligible from: ${fmtDate(ld)}</strong></div></div>`;}else{html=renderLicensedOutput(code,ld,workup,'Years licensed',`Based on reported first license age: ${expAgeValue} · Calculated license date: ${fmtDate(ld)}`);}}
     resultDiv.innerHTML=html;return;
   }
 
