@@ -263,6 +263,26 @@
   /* Disabled toggle is clickable — clicking it swaps the active mode */
   .exp-panel.panel-disabled .toggle-switch { opacity:0.4; }
   .exp-panel.panel-disabled .exp-title { color:var(--meta); opacity:0.55; }
+
+  /* ── Smartphone breakpoint ────────────────────────────── */
+  @media (max-width: 524px) {
+    body { padding: 1.5rem .875rem 3rem; }
+    .header { gap: 10px; margin-bottom: .5rem; }
+    .logo-box { width: 36px; height: 36px; }
+    .logo-box svg { width: 19px; height: 19px; }
+    .header-text h1 { font-size: 15px; letter-spacing: 0; }
+    .header-text p { font-size: 11px; }
+    .important-note { font-size: 11px; }
+    .card { padding: 1.1rem; }
+    .row { grid-template-columns: 1fr; gap: 0; }
+    .btn-row { grid-template-columns: 1fr; }
+    .btn-clear { justify-content: center; }
+    .tile-num { font-size: 22px; }
+    .tile { padding: 7px 14px; min-width: 56px; }
+    .range-badge { font-size: 15px; padding: 8px 15px; }
+    .theme-toggle { width: 34px; height: 34px; }
+    .theme-toggle svg { width: 16px; height: 16px; }
+  }
 </style>
 </head>
 <body>
